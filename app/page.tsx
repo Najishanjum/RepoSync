@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   AlertTriangle, ArrowUpRight, BookOpen, Bot, Check, ChevronDown, ChevronRight,
   Code2, Download, ExternalLink, FileCode2, FileText, Folder, GitBranch, Github,
   HardDrive, KeyRound, Layers3, LayoutDashboard, Loader2, LockKeyhole,
-  MessageSquare, MoreHorizontal, Network, Play, Plus, RefreshCw, Search, Send,
-  Settings2, ShieldCheck, Sparkles, Terminal, TrendingUp, Zap, X,
+  MessageSquare, MoreHorizontal, Network, Pause, Play, Plus, RefreshCw, Search, Send,
+  Settings2, ShieldCheck, Sparkles, Square, Terminal, TrendingUp, Volume2, Zap, X,
 } from 'lucide-react';
 
 type Section = 'Overview' | 'Blueprint' | 'Files' | 'Dependencies' | 'Security' | 'AI Copilot';
@@ -312,31 +312,7 @@ export default function Home() {
           {a && <div className="heading-actions"><span className="branch-tag"><GitBranch size={14} /> {a.repo.defaultBranch}</span><button className="quiet-button"><MoreHorizontal size={17} /></button></div>}
         </div>
 
-        {!a && !isAnalyzing && <div className="hero-video-section">
-          <div className="hero-video-glow" />
-          <div className="hero-video-content">
-            <div className="hero-video-badge"><Sparkles size={13} /> REPOSITORY INTELLIGENCE PLATFORM</div>
-            <h2 className="hero-video-title">Repo<span>Sync</span></h2>
-            <p className="hero-video-subtitle">Understand, run, and improve any public GitHub repository — powered by AI.</p>
-          </div>
-          <div className="hero-video-wrapper">
-            <div className="hero-video-frame">
-              <div className="hero-video-frame-header">
-                <span className="frame-dot red" /><span className="frame-dot yellow" /><span className="frame-dot green" />
-                <span className="frame-url">reposync.dev</span>
-              </div>
-              <video className="hero-video" autoPlay muted loop playsInline>
-                <source src="/RepoSync.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-          <div className="hero-video-features">
-            <div className="hero-feature"><GitBranch size={16} /><div><b>Deep Analysis</b><span>Index every file, dependency, and secret</span></div></div>
-            <div className="hero-feature"><ShieldCheck size={16} /><div><b>Security Scan</b><span>Detect exposed credentials instantly</span></div></div>
-            <div className="hero-feature"><Bot size={16} /><div><b>AI Copilot</b><span>Ask anything about any repository</span></div></div>
-          </div>
-        </div>}
+        {!a && !isAnalyzing && <HeroVideo />}
 
         {a && <>
           {active === 'Overview' && <Overview a={a} expandedIssue={expandedIssue} setExpandedIssue={setExpandedIssue} onCopilot={() => setActive('AI Copilot')} addToWorkspace={addToWorkspace} />}
@@ -352,6 +328,112 @@ export default function Home() {
     {showSettings && <SettingsModal exportFormat={exportFormat} setExportFormat={setExportFormat} onClose={() => setShowSettings(false)} />}
     {showWorkspace && <WorkspaceModal items={workspaceItems} setItems={setWorkspaceItems} input={workspaceInput} setInput={setWorkspaceInput} onClose={() => setShowWorkspace(false)} a={a} />}
   </main>;
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function HeroVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
+      setProgress(video.duration ? (video.currentTime / video.duration) * 100 : 0);
+    };
+    const onLoaded = () => {
+      setDuration(video.duration);
+      video.play().catch(() => {});
+    };
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+
+    video.addEventListener('timeupdate', onTimeUpdate);
+    video.addEventListener('loadedmetadata', onLoaded);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+
+    return () => {
+      video.removeEventListener('timeupdate', onTimeUpdate);
+      video.removeEventListener('loadedmetadata', onLoaded);
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+    };
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) { video.play(); } else { video.pause(); }
+  }, []);
+
+  const handleStop = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    video.currentTime = 0;
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setProgress(0);
+  }, []);
+
+  const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const video = videoRef.current;
+    if (!video || !video.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    video.currentTime = pos * video.duration;
+  }, []);
+
+  return <div className="hero-video-section">
+    <div className="hero-video-glow" />
+    <div className="hero-video-content">
+      <div className="hero-video-badge"><Sparkles size={13} /> REPOSITORY INTELLIGENCE PLATFORM</div>
+      <h2 className="hero-video-title">Repo<span>Sync</span></h2>
+      <p className="hero-video-subtitle">Understand, run, and improve any public GitHub repository — powered by AI.</p>
+    </div>
+    <div className="hero-video-wrapper">
+      <div className="hero-video-frame">
+        <div className="hero-video-frame-header">
+          <span className="frame-dot red" /><span className="frame-dot yellow" /><span className="frame-dot green" />
+          <span className="frame-url">reposync.dev</span>
+        </div>
+        <video ref={videoRef} className="hero-video" autoPlay loop playsInline>
+          <source src="/RepoSync.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="video-controls">
+          <button className="vc-btn" onClick={togglePlay} aria-label={isPlaying ? 'Pause' : 'Play'}>
+            {isPlaying ? <Pause size={14} /> : <Play size={14} fill="currentColor" />}
+          </button>
+          <button className="vc-btn" onClick={handleStop} aria-label="Stop">
+            <Square size={12} fill="currentColor" />
+          </button>
+          <div className="vc-timeline" onClick={handleSeek}>
+            <div className="vc-timeline-fill" style={{ width: `${progress}%` }} />
+            <div className="vc-timeline-thumb" style={{ left: `${progress}%` }} />
+          </div>
+          <span className="vc-time">{formatTime(currentTime)} / {formatTime(duration)}</span>
+          <span className="vc-volume"><Volume2 size={14} /></span>
+        </div>
+      </div>
+    </div>
+    <div className="hero-video-features">
+      <div className="hero-feature"><GitBranch size={16} /><div><b>Deep Analysis</b><span>Index every file, dependency, and secret</span></div></div>
+      <div className="hero-feature"><ShieldCheck size={16} /><div><b>Security Scan</b><span>Detect exposed credentials instantly</span></div></div>
+      <div className="hero-feature"><Bot size={16} /><div><b>AI Copilot</b><span>Ask anything about any repository</span></div></div>
+    </div>
+  </div>;
 }
 
 function Overview({ a, expandedIssue, setExpandedIssue, onCopilot, addToWorkspace }: { a: AnalysisResult; expandedIssue: number | null; setExpandedIssue: (v: number | null) => void; onCopilot: () => void; addToWorkspace: (item: string) => void }) {
