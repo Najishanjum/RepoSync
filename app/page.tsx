@@ -312,7 +312,31 @@ export default function Home() {
           {a && <div className="heading-actions"><span className="branch-tag"><GitBranch size={14} /> {a.repo.defaultBranch}</span><button className="quiet-button"><MoreHorizontal size={17} /></button></div>}
         </div>
 
-        {!a && !isAnalyzing && <div className="empty-state"><div className="copilot-orbit"><Github size={28} /></div><h2>Ready to analyze</h2><p>Paste any public GitHub repository URL above and click Analyze to generate a complete blueprint with real metadata, file tree, dependencies, security scan, and AI Copilot.</p></div>}
+        {!a && !isAnalyzing && <div className="hero-video-section">
+          <div className="hero-video-glow" />
+          <div className="hero-video-content">
+            <div className="hero-video-badge"><Sparkles size={13} /> REPOSITORY INTELLIGENCE PLATFORM</div>
+            <h2 className="hero-video-title">Repo<span>Sync</span></h2>
+            <p className="hero-video-subtitle">Understand, run, and improve any public GitHub repository — powered by AI.</p>
+          </div>
+          <div className="hero-video-wrapper">
+            <div className="hero-video-frame">
+              <div className="hero-video-frame-header">
+                <span className="frame-dot red" /><span className="frame-dot yellow" /><span className="frame-dot green" />
+                <span className="frame-url">reposync.dev</span>
+              </div>
+              <video className="hero-video" autoPlay muted loop playsInline>
+                <source src="/RepoSync.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+          <div className="hero-video-features">
+            <div className="hero-feature"><GitBranch size={16} /><div><b>Deep Analysis</b><span>Index every file, dependency, and secret</span></div></div>
+            <div className="hero-feature"><ShieldCheck size={16} /><div><b>Security Scan</b><span>Detect exposed credentials instantly</span></div></div>
+            <div className="hero-feature"><Bot size={16} /><div><b>AI Copilot</b><span>Ask anything about any repository</span></div></div>
+          </div>
+        </div>}
 
         {a && <>
           {active === 'Overview' && <Overview a={a} expandedIssue={expandedIssue} setExpandedIssue={setExpandedIssue} onCopilot={() => setActive('AI Copilot')} addToWorkspace={addToWorkspace} />}
