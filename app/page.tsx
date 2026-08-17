@@ -323,6 +323,11 @@ export default function Home() {
           {active === 'AI Copilot' && <Copilot a={a} messages={messages} input={copilotInput} setInput={setCopilotInput} ask={askCopilot} />}
         </>}
       </div>
+      <footer className="site-footer">
+        <span>CREATED BY <a href="https://najish-anjum-portfolio.vercel.app/" target="_blank" rel="noreferrer">NAJISH</a></span>
+        <span className="footer-dot">·</span>
+        <a href="https://github.com/Najishanjum" target="_blank" rel="noreferrer" className="footer-github"><Github size={15} /> GITHUB</a>
+      </footer>
     </section>
 
     {showSettings && <SettingsModal exportFormat={exportFormat} setExportFormat={setExportFormat} onClose={() => setShowSettings(false)} />}
