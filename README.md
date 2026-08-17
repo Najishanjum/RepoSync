@@ -1,7 +1,4 @@
 # RepoSync — Repository Intelligence
-
-[![Open in Bolt](https://bolt.new/static/open-in-bolt.svg)](https://bolt.new/~/sb1-cpj148ra)
-
 RepoSync is a developer tool that analyzes any public GitHub repository and generates a complete, actionable blueprint — architecture overview, file tree, dependency health, security scan, prioritized recommendations, optimization suggestions, and an AI Copilot to ask questions about the codebase.
 
 ---
